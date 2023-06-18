@@ -1,4 +1,4 @@
-# Программа регулярного чтения датчика температуры и посылки сообщения телеботу
+# Program for regularly reading the temperature sensor and sending a message to the telebot
 #pip install requests
 #pip install --upgrade pip
 import requests
@@ -44,18 +44,18 @@ def read_tempera():
 
 def check_tempera():
     global _time,_time_dflt
-    threading.Timer(_time, check_tempera).start()  # Перезапуск через 3600 секунд - каждый час
+    threading.Timer(_time, check_tempera).start()  # Restart after 3600 seconds - every hour
     _temp=read_tempera()
-    _msg="👉 температура "+str(_temp)
+    _msg="👉 temperature "+str(_temp)
     _dt=str(datetime.datetime.today().strftime("%Y-%m-%d_%H.%M"))
 
     #print(_temp)
     if _temp < _param["min_threshold"]:
-        _msg=" 🚨🚨🚨🚨🚨 Внимание предельный нижний порог темпратуры "+str(_temp)
+        _msg=" 🚨🚨🚨🚨🚨 Attention limit lower temperature threshold "+str(_temp)
         send_telegram(_msg)
         _time=60
     elif _temp > _param["max_threshold"]:
-        _msg=" 🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨 Внимание предельный верхний порог темпратуры "+str(_temp)
+        _msg=" 🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨 Attention upper temperature limit "+str(_temp)
         send_telegram(_msg)
         _time=60
     elif _param["dubug_print"]:
@@ -82,9 +82,9 @@ def save_db(_dt,_msg,_temp):
 
 
 if __name__ == '__main__':
-    msg=" ✅ Старт мониторинга температурного датчика. Периодичность: "+str(_param["timeout"])+", пороги оповещения: "+str(_param["min_threshold"])+" "+str(_param["max_threshold"])
+    msg=" ✅ Start monitoring the temperature sensor. Periodicity: "+str(_param["timeout"])+", alert thresholds: "+str(_param["min_threshold"])+" "+str(_param["max_threshold"])
     send_telegram(msg+ " "+socket.gethostname()+" "+str(socket.gethostbyname(socket.gethostname())))
-    send_telegram("Текущая температура "+str(read_tempera()))
+    send_telegram("Current temperature "+str(read_tempera()))
     _ret=save_db("",msg,"")
     print(_ret,msg)
     check_tempera()

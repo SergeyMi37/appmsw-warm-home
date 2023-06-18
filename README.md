@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/SergeyMi37/apptools-smarthome/master/doc/smarthome.png)
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-smarthome/master/doc/warmhome.png)
 ## apptools-smarthome
 [![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-smarthome)
 [![GitHub all releases](https://img.shields.io/badge/Available%20on-GitHub-black)](https://github.com/SergeyMi37/apptools-smarthome)
@@ -6,9 +6,7 @@
 
 Template and examples for creating a user interface for a smart home
 
-Load http:// your-host:your-port/apptoolsrest/a/smarthome
-
-Change the path to your treasure files and start viewing, listening or reading from any convenient device: desktop, tablet or smartphone.
+The project includes a python program for rasperry pi to read the temperature sensor and send a message to the telebot
 
 ## Installation with ZPM
 
@@ -18,7 +16,7 @@ set $namespace="%SYS", name="DefaultSSL" do:'##class(Security.SSLConfigs).Exists
 ```
 If ZPM is installed, then ZAPM can be set with the command
 ```
-zpm:USER>install apptools-smarthome
+zpm:USER>install apptools-warmhome
 ```
 ## Installation with Docker
 
@@ -29,7 +27,7 @@ Make sure you have [git](https://git-scm.com/book/en/v2/Getting-Started-Installi
 Clone/git pull the repo into any local directory
 
 ```
-$ git clone https://github.com/SergeyMi37/apptools-smarthome.git
+$ git clone https://github.com/SergeyMi37/apptools-warmhome.git
 ```
 
 Open the terminal in this directory and run:
@@ -43,6 +41,7 @@ $ docker-compose build
 ```
 $ docker-compose up -d
 ```
+
 ## How to Test it
 Open IRIS terminal:
 
@@ -50,5 +49,5 @@ Open IRIS terminal:
 $ docker-compose exec iris iris session iris
 USER>
 USER>zpm
-zpm:USER>install apptools-smarthome
+zpm:USER>install apptools-warmhome
 ```

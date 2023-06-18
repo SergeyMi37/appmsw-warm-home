@@ -1,11 +1,11 @@
 Include apptools.core
 
-/// http://hp-msw:52773/apptoolsrest/a/smarthome
-Class apptools.lte.smarthome Extends apptools.lte.adminTabs [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
+/// http://hp-msw:52773/apptoolsrest/a/warmhome&namespace=USER
+Class apptools.lte.warmhome Extends apptools.lte.adminTabs [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
 {
 
 /// Application title
-Parameter HeaderText = "Home, smart home";
+Parameter HeaderText = "Home, warm Home";
 
 /// Global Name Store Referens files
 Parameter GNStore = "^appmsw.smarthome.ui";
@@ -26,7 +26,7 @@ ClassMethod MainParameter(ByRef h, ByRef par) As %Status
  set path=par("=path=")
  set base64=##class(apptools.core.rest).getStatic(..%ClassName(1)_":image")
  set par("=path=")=path
- set par("=Brand-Text=")="Smart Home"
+ set par("=Brand-Text=")="Warm Home"
  set par("=Logo-image=")=base64
  set par("=titleAppToolsadmin=")=..#HeaderText
  set par("<!--=LinkIcon=-->")=..GetAppIcon(,"png",base64)
@@ -40,93 +40,241 @@ ClassMethod GetAllApps(opt) As %Status
 	if ..IsPermiss("%All") {	
 	;make them zavisimye from the area
 	;------------ sidebar
-	s key="menu-first"
-	set Level1=$lb(1,"Home",1) ;$lg(,3)=1 - open menu level 1
-	s opt(key)="Sensor values" ;The name of the menu
-	s opt(key,"id")="Find" ;use methods: FindFirstHead FindResult
-	s opt(key,"TabName")="Sensors" ;the name of the tab
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabSample"
-	s opt(key,"Disable")=0 ;developed
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"Menu")=Level1
-	s opt(key,"Active")=1 ;active menu item
-
-	s key="menu-first2"
-	s opt(key)="Snapshots" ;Pictures from cameras
-	s opt(key,"id")="Lighbox" ;use methods: LighboxFirstHead LighboxResult
-	s opt(key,"TabName")="Snapshots" ;the name of the tab
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabSample"
-	s opt(key,"Disable")=0 ;developed
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"Menu")=Level1
-
-	;----------
-	s key="menu-second"
-	set Level2=$lb(2,"Tablo",0)
-	s opt(key)="Tenis"
-	s opt(key,"id")="Tenis"
-	s opt(key,"TabName")="Ping pong scores"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"MethodUrl")="http://ShowTabAbout.cls"
-	s opt(key,"Disable")=1 ;developed
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"Menu")=Level2
-
-	s key="menu-second2"
-	s opt(key)="About"
-	s opt(key,"id")="About"
-	s opt(key,"TabName")="About"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabAbout"
-	s opt(key,"Disable")=1 ;developed
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"Menu")=Level2
-
+	set ns=$namespace
+	set sideMenuName="Tables",
+		sideMenuNumer=1,
+		sideMenuOpen=1,        //3 =1 open menu
+		sideMenuIcon="fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
+		set key="Sensors"
+		set opt(key,"Menu")=sideMenu
+		set opt(key)="Sensors"
+		set opt(key,"id")=key
+		set opt(key,"TabName")="Sensors"
+		set opt(key,"ClassName")=..%ClassName(1)
+		set opt(key,"Role")="%All"
+		set opt(key,"Namespace")=ns
+		set opt(key,"Method")="ShowTabSample"
+		set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
+		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set opt(key,"Active")=1 ;active menu item
+		
+		set key="FilesServ"
+		set opt(key)="FilesServ"
+		set opt(key,"id")="FS"
+		set opt(key,"TabName")=opt(key)
+		set opt(key,"ClassName")="apptools.lte.info"
+		set opt(key,"Method")="ShowTabSample"
+		set opt(key,"TabMenu","Close")=1
+		set opt(key,"Namespace")=ns
+		set opt(key,"Menu")=sideMenu
+		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 	
 	;------------ one-level upper menu 
 		s key="menu-topOpt"
-	s opt(key)="Option"
-	s opt(key,"id")="Option"
-	s opt(key,"TabName")="Option"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabAbout"
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"MenuTop")=$lb(2,"Option") ;has no sub-items
+		s opt(key)="Parameter"
+		s opt(key,"id")="Param"
+		s opt(key,"TabName")="Parameter"
+		s opt(key,"ClassName")=..%ClassName(1)
+		s opt(key,"Method")="ShowTabSample"
+		s opt(key,"TabMenu","Close")=1
+		s opt(key,"MenuTop")=$lb(2,"Option") ;has no sub-items
+
+		s key="menu-topOptMenu"
+		s opt(key)="SideMenu"
+		s opt(key,"id")="SideMenu"
+		s opt(key,"TabName")="SideMenu"
+		s opt(key,"ClassName")=..%ClassName(1)
+		s opt(key,"Method")="ShowTabSample"
+		s opt(key,"TabMenu","Close")=1
+		s opt(key,"MenuTop")=$lb(2,"Option") ;has no sub-items
 
 	;------------ top menu the top-accoun
-	s key="menu-top-accoun"
-	set Level99=$lb(99,"Account") ;only 99-account has sub-items
-	s opt(key)="Profile"
-	s opt(key,"id")="AccountProf"
-	s opt(key,"TabName")="Profile"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabAbout"
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"MenuTop")=Level99
+		s key="menu-top-accoun"
+		set Level99=$lb(99,"Account") ;only 99-account has sub-items
+		s opt(key)="Profile"
+		s opt(key,"id")="AccountProf"
+		s opt(key,"TabName")="Profile"
+		s opt(key,"ClassName")=..%ClassName(1)
+		s opt(key,"Method")="ShowTabAbout"
+		s opt(key,"TabMenu","Close")=1
+		s opt(key,"MenuTop")=Level99
 
-	s key="menu-top-account3"
-	s opt(key)="Exit"
-	s opt(key,"id")="AccountExit"
-	s opt(key,"TabName")="Exit"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="Logout"
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"MenuTop")=Level99
-	
-	;----- Setup the search in the top menu
-	s key="Search"
-	s opt(key)="Search"
-	s opt(key,"id")="Search-"
-	s opt(key,"TabName")="Search"_"-"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabSearch"
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
+		s key="menu-top-account3"
+		s opt(key)="Exit"
+		s opt(key,"id")="AccountExit"
+		s opt(key,"TabName")="Exit"
+		s opt(key,"ClassName")=..%ClassName(1)
+		s opt(key,"Method")="Logout"
+		s opt(key,"TabMenu","Close")=1
+		s opt(key,"MenuTop")=Level99
+		
+		;----- Setup the search in the top menu
+		s key="Search"
+		s opt(key)="Search"
+		s opt(key,"id")="Search-"
+		s opt(key,"TabName")="Search"_"-"
+		s opt(key,"ClassName")=..%ClassName(1)
+		s opt(key,"Method")="ShowTabSearch"
+		s opt(key,"TabMenu","Close")=1
+		s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
 	
 	}
 	q $$$OK
+}
+
+ClassMethod SensorsFirstHead(Par = "") As %Status
+{
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set %ui=1
+	set dataFrom=$zd($h-1,3)
+	set dataTo=$zd($h,3)
+	set adress=""
+	set onclick=$$$blockui("Load...")_
+		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	&html<
+		<table>
+		<tr>
+			<td>
+			</td>
+			<td>
+			Adress #($$$appText(divId_"adress","title='"_"Адресс датчика'",adress))#
+			</td>
+			<td>
+			#($$$appButton(divId_"appButtonResult1","onclick="""_$replace(onclick,"*",1)_"""","Search"))#
+			</td>
+		</tr>
+		</table>
+	>
+	$$$SetHeightContent(divId,250)
+	q $$$OK
+}
+
+/// Search result 
+ClassMethod SensorsResult(Par = "") As %Status
+{
+	set %ui=1
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+	;set adress=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"adress")
+	write ..ButtonAgain(divId,key)
+
+	set sql="select * from apptools_core.Log "
+	;if adress'="" set sql=sql_" "_$s(sql["where":"and",1:"where")_" ADDRESS [ '"_adress_"' "
+
+	set ref=%request.CgiEnvs("HTTP_REFERER")
+	set url=$p(ref,"/a/",1)_"/a/info&namespace="_$namespace_"&autoload=FS"
+	set urlfs=" Fileserver in new window <a target=findinfo href='"_url_"'> link </a>"
+	
+	if mode=1 {
+		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,1000,$zu(5),sql,$GET(exec),,1)
+		if 'st  write $$$appError($System.Status.GetErrorText(st))
+	}
+	elseif mode=2 {
+		do ##class(apptools.core.LogInfo).GetInputXLSTagsVal(.exportXLS, .exportXLSfile, .exportXLSfileEmail)
+		
+		Set slash=$Select($ZVersion(1)=3:"/",1:"\")
+		Set TempDir = ##class(%File).GetDirectory(##class(%File).GetDirectory($ZUtil(86))_"mgr"_slash_"Temp"_slash)
+		$$$ThrowOnError(##class(%File).CreateDirectoryChain(TempDir))
+
+		set filexlsx=TempDir_$p(exportXLSfile,slash,*)_"x"
+		set format("freeze")="B3",format("sheetname")=$username
+		set title="Export XLSX Query: "_$g(sql)
+		;set st=##class(apptools.python.xlsx).sql2xlsx(sql,.format,filexlsx)
+		;w "s st=##class(apptools.python.xlsx).sql2xlsx("""_sql_""","""","""_filexlsx_""")"
+		
+		set gn="^||tmp",format=",s30,s50,s50,s15" 
+		set format("title")=title
+
+ 		set st=##class(apptools.core.sys).sql2gn(sql,,gn)
+
+ 		if 'st  write $$$appError($System.Status.GetErrorText(st)) quit st
+
+ 		set IsVer=($SYSTEM.Version.Format(5,$zv)'>2021.2)
+
+ 		set exec="##class(apptools.python.xlsx).MarkRed(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp)"
+ 		set st=##class(apptools.python.xlsx).gn2xlsx(gn,.format,filexlsx,title,,,,$g(exec))
+ 		if 'st  write $$$appError($System.Status.GetErrorText(st)) quit st
+
+		set st=##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(filexlsx,$$$slash,*), filexlsx, title,"apptools",.size)
+		write "<br>The report will be saved to a file <b>"_$p(filexlsx,$$$slash,*)_"</b> and will be available via "_urlfs quit $$$OK
+	}
+	w "<br>"_urlfs
+	
+	quit $$$OK
+}
+
+/// to download a form for editing
+ClassMethod ParamFirstHead(Par = "") As %Status
+{
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set class="apptools.core.Parameter"
+	
+	set sql="select * from "_class_" where Name is not null order by id desc"
+	;The list of fields displayed in the Value attribute of the Option tag, 
+	;The first field of the query must be an identifier
+	set listFields="ID,ID,Name,Description"
+	write $$$aText("Select settings","")
+	s ONCHANGE=";$('#"_divId_"SelectId').attr('value',data.item.value);"
+	do ##class(apptools.core.Form).SelectObj(sql,ONCHANGE,listFields,.gn,divId_"Select")
+	
+	write "<br>"_$$$appInputHidden(divId_"SelectId","","")_"<br>"
+	
+	set onclick=$$$blockui("Wait...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","~key="_key_"~divId="_divId_"~class="_class_"~mode=*")
+
+	write $$$appTable1(class)
+	;set butt1=$$$appButton(divId_"appButtonResult1","onclick="""_$replace(onclick,"*",1)_"""",$$$aText("Preview mode in two columns",""))
+	set butt2=$$$appButton(divId_"appButtonResult2","onclick="""_$replace(onclick,"*",2)_"""",$$$aText("Create parameter",""))
+	set butt3=$$$appButton(divId_"appButtonResult3","onclick="""_$replace(onclick,"*",3)_"""",$$$aText("The view mode from table",""))
+	write $$$appTableTrTd1(butt2_butt3)
+	write $$$appTableEnd1
+	quit $$$OK
+}
+
+// The result of selecting the edit mode settings
+
+ClassMethod ParamResult(Par = "") As %Status
+{
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+	set class=Par("class")
+	set SelectId=$g(Par("%request.Data",divId_"SelectId"))
+	write ..ButtonAgain(divId,key)
+	if mode=1 {
+		;the order of the fields in two columns by the delimiter :
+		set order="Name,Description:Value,Types:DateStart,DateFinish:isEnabled,isEnabledCheck:File,OfficeFile:ImageFile,ImageGlobal::,"
+		do Show(0,order)
+		quit $$$OK
+	} 
+	elseif mode=2 {
+		;the order of fields by default
+		set order=""
+		do Show("1,ShowFieldName",order)
+		quit $$$OK
+	} 
+	elseif mode=3 {
+		set sql="select * from apptools_core.Parameter"
+		set exec="##class(apptools.Form.Explorer).WinEditObj(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp,"""_$zu(5)_""")"
+		set st=##class(apptools.Form.Explorer).SelectObjects(class,sql,exec)
+		write 'st w $$$appError($System.Status.GetErrorText(st)) 
+	}
+	q $$$OK
+Show(modeShow,order)
+	set obj=##class(apptools.core.Form).GetObj(SelectId_","_class)
+	if '$isobject(obj) { 
+		set msg=$$$aText("Failed to open object ","")_SelectId_","_class
+		write $$$appError(msg) q $$$ERROR($$$GeneralError,msg)
+	}
+	do ##class(apptools.core.Form).Show(obj,modeShow,divId,order)
+ q
 }
 
 /// set base64 = ##class(apptools.core.rest).getStatic("apptools.lte.smarthome:image") w !,base64,!

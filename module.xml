@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-  <Document name="apptools-warm-home.ZPM">
+  <Document name="apptools-warmhome.ZPM">
     <Module>
-    <Name>apptools-warm-home</Name>
-    <Version>1.0.0</Version>
-	<Description>Template and examples for creating a user interface for a smart and warm home.</Description>
+    <Name>apptools-warmhome</Name>
+    <Version>1.1.5</Version>
+	<Description>Template and examples for creating a user interface for a smart home.</Description>
     <Packaging>module</Packaging>
-	<Keywords>Application tools warm home</Keywords>
+	<Keywords>Application tools warmhome</Keywords>
 	<Author>
 	<Person>Mikhaylenko Sergey</Person>
 	<CopyrightDate>2023</CopyrightDate>
@@ -20,9 +20,9 @@
     </Dependencies>
 	<SourcesRoot>src</SourcesRoot>
 	<Invokes>
-        <Invoke Class="apptools.lte.smarthome" Method="Init"></Invoke>
+        <Invoke Class="apptools.lte.warmhome" Method="Init"></Invoke>
     </Invokes>
-	<Resource Name="apptools.lte.smarthome.CLS"/>
+	<Resource Name="apptools.lte.warmhome.CLS"/>
     </Module>
   </Document>
 </Export>
