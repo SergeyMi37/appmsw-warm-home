@@ -4,6 +4,10 @@
 [![GitHub all releases](https://img.shields.io/badge/Available%20on-GitHub-black)](https://github.com/SergeyMi37/apptools-smarthome)
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## apptools-warm-home
+[![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-warm-home) 
+[![Demo](https://img.shields.io/badge/Demo%20on-Cloud%20Run%20Deploy-F4A460)](https://appadmin.demo.community.intersystems.com/apptoolsrest/a/warmhome&namespace=USER)
+
 Template and examples for creating a user interface for a smart home
 
 The project includes a python program for rasperry pi to read the temperature sensor and send a message to the telebot
