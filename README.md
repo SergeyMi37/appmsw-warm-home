@@ -9,7 +9,7 @@
 
 Template and examples for creating a user interface for a smart home
 
-The project includes a python program for rasperry pi to read the temperature sensor and send a message to the telebot
+The project includes a python [program](https://raw.githubusercontent.com/SergeyMi37/appmsw-warm-home/master/python/check-send.py) for rasperry pi to read the temperature sensor and send a message to the telebot
 
 ## Installation with ZPM
 
