@@ -1,7 +1,7 @@
 ![](https://raw.githubusercontent.com/SergeyMi37/appmsw-warm-home/master/doc/warmhome.png)
 ## apptools-warm-home
 
-[![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-warm-home) 
+[![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/appmsw-warm-home) 
 [![Demo](https://img.shields.io/badge/Demo%20on-Cloud%20Run%20Deploy-F4A460)](https://warmhome.demo.community.intersystems.com/apptoolsrest/a/warmhome&namespace=USER)
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
