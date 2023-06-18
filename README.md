@@ -1,15 +1,13 @@
 ![](https://raw.githubusercontent.com/SergeyMi37/appmsw-warm-home/master/doc/warmhome.png)
 ## apptools-warm-home
-[![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/appmsw-warm-home)
-[![GitHub all releases](https://img.shields.io/badge/Available%20on-GitHub-black)](https://github.com/SergeyMi37/appmsw-warm-home)
-[![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-warm-home) 
 [![Demo](https://img.shields.io/badge/Demo%20on-Cloud%20Run%20Deploy-F4A460)](https://warmhome.demo.community.intersystems.com/apptoolsrest/a/warmhome&namespace=USER)
+[![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Template and examples for creating a user interface for a smart home
 
-The project includes a python [program](https://raw.githubusercontent.com/SergeyMi37/appmsw-warm-home/master/python/check-send.py) for rasperry pi to read the temperature sensor and send a message to the telebot
+The project includes a python [program](https://raw.githubusercontent.com/SergeyMi37/appmsw-warm-home/master/python/check-send.py) for `Raspberry Pi` to read the temperature sensor and send a message to the telebot
 
 ## Installation with ZPM
 
