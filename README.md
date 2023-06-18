@@ -1,12 +1,11 @@
-![](https://raw.githubusercontent.com/SergeyMi37/apptools-smarthome/master/doc/warmhome.png)
-## apptools-smarthome
-[![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-smarthome)
-[![GitHub all releases](https://img.shields.io/badge/Available%20on-GitHub-black)](https://github.com/SergeyMi37/apptools-smarthome)
+![](https://raw.githubusercontent.com/SergeyMi37/appmsw-warm-home/master/doc/warmhome.png)
+## apptools-warm-home
+[![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/appmsw-warm-home)
+[![GitHub all releases](https://img.shields.io/badge/Available%20on-GitHub-black)](https://github.com/SergeyMi37/appmsw-warm-home)
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## apptools-warm-home
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-warm-home) 
-[![Demo](https://img.shields.io/badge/Demo%20on-Cloud%20Run%20Deploy-F4A460)](https://appadmin.demo.community.intersystems.com/apptoolsrest/a/warmhome&namespace=USER)
+[![Demo](https://img.shields.io/badge/Demo%20on-Cloud%20Run%20Deploy-F4A460)](https://warmhome.demo.community.intersystems.com/apptoolsrest/a/warmhome&namespace=USER)
 
 Template and examples for creating a user interface for a smart home
 
@@ -31,7 +30,7 @@ Make sure you have [git](https://git-scm.com/book/en/v2/Getting-Started-Installi
 Clone/git pull the repo into any local directory
 
 ```
-$ git clone https://github.com/SergeyMi37/apptools-warmhome.git
+$ git clone https://github.com/SergeyMi37/appmsw-warm-home.git
 ```
 
 Open the terminal in this directory and run:
@@ -53,5 +52,5 @@ Open IRIS terminal:
 $ docker-compose exec iris iris session iris
 USER>
 USER>zpm
-zpm:USER>install apptools-warmhome
+zpm:USER>install appmsw-warm-home
 ```
