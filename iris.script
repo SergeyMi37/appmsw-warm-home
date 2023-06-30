@@ -7,7 +7,8 @@ Do ##class(Security.Users).UnExpireUserPasswords("*")
 
 zn "USER"
 zpm "load https://github.com/SergeyMi37/apptools-admin.git"
-
+;zpm "install webterminal"
+zpm "load https://github.com/intersystems-community/webterminal.git"
 zpm "load /opt/irisapp/ -v":1
 
 zpm "load https://github.com/SergeyMi37/isc-passwordless"
