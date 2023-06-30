@@ -35,29 +35,77 @@ ClassMethod MainParameter(ByRef h, ByRef par) As %Status
 }
 
 /// what modes are available
+ClassMethod SetPropSideMenu(json, ByRef opt, key, name, val) As %Status
+{
+	set opt(key,name)=val
+	try {
+		set a={}.$$$jsonFromJSON(json).$$$jsonGet(name)
+		if a'="" set opt(key,name)=a
+	} catch e {}
+	quit $$$OK
+}
+
+/// what modes are available
+ClassMethod GetAppsSideMenu(nspace, class, category = "", sideMenu, ByRef opt, PREFIX) As %Status
+{
+		set sql="select * from "_##class(apptools.core.type).GetTableName(class)_" where Name is not null and isEnabledCheck = 1 and Types ='SideMenuLTE' and Value ='"_category_"'"
+		set gn="tmp"
+		do ##class(apptools.core.sys).sql2gn(sql,,gn)
+ 
+		for i=1:1 { quit:'$d(@gn@(i))  
+			set id=##class(apptools.core.sys).GetValue(gn,i,"ID")
+			set obj=$ClassMethod(class,"%OpenId",id)
+			if '$IsO(obj) continue
+			set ns=$p(obj.Name,"key:",2)
+			set json=obj.JSON
+			;if 1 continue
+			set key=PREFIX_ns
+			set opt(key,"Menu")=sideMenu
+			set opt(key)=ns
+			set opt(key,"id")=PREFIX_ns
+			set opt(key,"ClassMetod")=PREFIX_"FirstHead" ;class name is the same for all name sensor
+			
+			;set opt(key,"TabName")=ns
+			do ..SetPropSideMenu(json,.opt,key,"TabName",ns)
+			set opt(key)=opt(key,"TabName")
+			
+			set opt(key,"Title")=obj.Description
+			set opt(key,"ClassName")=..%ClassName(1)
+			
+			do ..SetPropSideMenu(json,.opt,key,"Role","%All")
+			
+			do ..SetPropSideMenu(json,.opt,key,"Namespace",nspace)
+			if obj.Namespace'="" set opt(key,"Namespace")=obj.Namespace
+			
+			set opt(key,"Method")="ShowTabSample"
+			
+			set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
+			try {
+				set a={}.$$$jsonFromJSON(json)."TabMenu"."Close"
+				if a'=""  set opt(key,"TabMenu","Close")=a
+			} catch e {}
+			
+			do ..SetPropSideMenu(json,.opt,key,"Active","")
+			
+			;set opt(key,"aw-icon")="fa-solid fa-temperature-high"    ;fa-solid fa-angle-right" ;"fa-solid fa-angle-up"  ; https://fontawesome.com/icons?d
+			do ..SetPropSideMenu(json,.opt,key,"aw-icon","fa-solid fa-temperature-high")
+
+		}
+	quit $$$OK
+}
+
+/// what modes are available
 ClassMethod GetAllApps(opt) As %Status
 {
 	if ..IsPermiss("%All") {	
 	;make them zavisimye from the area
 	;------------ sidebar
-	set ns=$namespace
-	set sideMenuName="Tables",
+	set nspace=$namespace
+	set sideMenuName="Reports",
 		sideMenuNumer=1,
 		sideMenuOpen=1,        //3 =1 open menu
 		sideMenuIcon="fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
 		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
-		set key="Sensors"
-		set opt(key,"Menu")=sideMenu
-		set opt(key)="Sensors"
-		set opt(key,"id")=key
-		set opt(key,"TabName")="Sensors"
-		set opt(key,"ClassName")=..%ClassName(1)
-		set opt(key,"Role")="%All"
-		set opt(key,"Namespace")=ns
-		set opt(key,"Method")="ShowTabSample"
-		set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
-		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
-		set opt(key,"Active")=1 ;active menu item
 		
 		set key="FilesServ"
 		set opt(key)="FilesServ"
@@ -66,10 +114,29 @@ ClassMethod GetAllApps(opt) As %Status
 		set opt(key,"ClassName")="apptools.lte.info"
 		set opt(key,"Method")="ShowTabSample"
 		set opt(key,"TabMenu","Close")=1
-		set opt(key,"Namespace")=ns
+		set opt(key,"Namespace")=nspace
 		set opt(key,"Menu")=sideMenu
 		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set opt(key,"Active")=1 ;active menu item
 	
+		set sideMenuName="Sensors",
+		sideMenuNumer=2,
+		sideMenuOpen=0,        //3 =1 open menu
+		sideMenuIcon="fa-solid fa-temperature-low" ;<i class="fa-solid fa-temperature-arrow-down"></i> fa-cube" ;"fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
+ 	
+		set class="apptools.core.Parameter"
+		do ..GetAppsSideMenu(nspace, class, "CategorySideMenuSensors",sideMenu, .opt, "NS") ;methods - NSFirstHead -> NSResult
+
+		set sideMenuName="Cameras",
+		sideMenuNumer=3,
+		sideMenuOpen=0,        //3 =1 open menu
+		sideMenuIcon="fa-solid fa-camera" ;<i class="fa-solid fa-camera-cctv"></i>  fa-cube" ;"fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
+ 	
+		set class="apptools.core.Parameter"
+		do ..GetAppsSideMenu(nspace, class, "CategorySideMenuCam",sideMenu, .opt, "Cam") ; methods - CamFirstHead -> CamResult
+
 	;------------ one-level upper menu 
 		s key="menu-topOpt"
 		s opt(key)="Parameter"
@@ -123,122 +190,152 @@ ClassMethod GetAllApps(opt) As %Status
 	q $$$OK
 }
 
-ClassMethod SensorsFirstHead(Par = "") As %Status
+ClassMethod GetSensorProp(key, pro, ns) As %Status
+{
+	//----------
+	set (NS,ns)=$p(key,"NS",2,*)
+	set class="apptools.core.Parameter"
+	set sql="select top 1 * from "_##class(apptools.core.type).GetTableName(class)_" where Name ='key:"_NS_"'"
+	set gn="tmp"
+	do ##class(apptools.core.sys).sql2gn(sql,,gn)
+	if '$d(@gn@(1)) w $$$appError($namespace_" Item is empty "_NS_" "_sql) quit $$$OK
+		
+	set id=##class(apptools.core.sys).GetValue(gn,1,"ID")
+	set obj=$ClassMethod(class,"%OpenId",id)
+	if '$IsO(obj) w $$$appError("Item is empty id "_id) quit $$$OK
+	
+	
+	set ns=$p(obj.Name,"key:",2)
+	set json=obj.JSON
+	do ..SetPropSideMenu(json,.pro,0,"URL","") 	
+	if pro(0,"URL")="" w $$$appError("Item is empty Json - URL") KILL pro quit $$$OK
+	
+	do ..SetPropSideMenu(json,.pro,0,"username","")
+	do ..SetPropSideMenu(json,.pro,0,"password","")
+	quit $$$OK
+}
+
+ClassMethod NSFirstHead(Par = "") As %Status
 {
 	do ##class(apptools.core.Form).BlockUI(0)
 	set key=Par("key")
 	set divId=Par("divId")
 	set %ui=1
-	set dataFrom=$zd($h-1,3)
-	set dataTo=$zd($h,3)
-	set adress=""
+	do ..GetSensorProp(key, .pro,.sens) 
+	if '$d(pro) quit $$$OK
+
 	set onclick=$$$blockui("Load...")_
-		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),"NSpaceResult","&key="_key_"&divId="_divId_"&mode=*")
+
+	write $$$appMsg("Get temperature sensor data "_sens)
+
+	s dataFrom=$zd($h-7,3)
+	s dataTo=$zd($h,3) ;##class(apptools.core.type).GetYear($h)_"-12-31"
 	&html<
 		<table>
 		<tr>
 			<td>
+			from #($$$appDate(divId_"fromDate","",dataFrom))#
 			</td>
 			<td>
-			Adress #($$$appText(divId_"adress","title='"_"Адресс датчика'",adress))#
+			to #($$$appDate(divId_"toDate","",dataTo))#
 			</td>
 			<td>
-			#($$$appButton(divId_"appButtonResult1","onclick="""_$replace(onclick,"*",1)_"""","Search"))#
+			#($g(selectNS))#
+			</td>
+			<td>
+			#($$$appButton(divId_"appButtonResult","onclick="""_$replace(onclick,"*","find")_"""","find"))#		
 			</td>
 		</tr>
 		</table>
 	>
+	$$$jsstart
+	write "$('#"_divId_"what').keydown(function (e) { if (e.ctrlKey && e.keyCode == 13) { $('#"_divId_"appButtonExe').click(); }});"
+	$$$jsstop
 	$$$SetHeightContent(divId,250)
-	q $$$OK
+	quit $$$OK
 }
 
-/// Search result 
-ClassMethod SensorsResult(Par = "") As %Status
+ClassMethod NSpaceResult(Par = "") As %Status
 {
-	set %ui=1
 	do ##class(apptools.core.Form).BlockUI(0)
 	set key=Par("key")
 	set divId=Par("divId")
 	set mode=Par("mode")
-	;set adress=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"adress")
-	write ..ButtonAgain(divId,key)
-
-	set sql="select * from apptools_core.Log "
-	;if adress'="" set sql=sql_" "_$s(sql["where":"and",1:"where")_" ADDRESS [ '"_adress_"' "
-
-	set ref=%request.CgiEnvs("HTTP_REFERER")
-	set url=$p(ref,"/a/",1)_"/a/info&namespace="_$namespace_"&autoload=FS"
-	set urlfs=" Fileserver in new window <a target=findinfo href='"_url_"'> link </a>"
 	
-	if mode=1 {
-		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,1000,$zu(5),sql,$GET(exec),,1)
-		if 'st  write $$$appError($System.Status.GetErrorText(st))
-	}
-	elseif mode=2 {
-		do ##class(apptools.core.LogInfo).GetInputXLSTagsVal(.exportXLS, .exportXLSfile, .exportXLSfileEmail)
-		
-		Set slash=$Select($ZVersion(1)=3:"/",1:"\")
-		Set TempDir = ##class(%File).GetDirectory(##class(%File).GetDirectory($ZUtil(86))_"mgr"_slash_"Temp"_slash)
-		$$$ThrowOnError(##class(%File).CreateDirectoryChain(TempDir))
-
-		set filexlsx=TempDir_$p(exportXLSfile,slash,*)_"x"
-		set format("freeze")="B3",format("sheetname")=$username
-		set title="Export XLSX Query: "_$g(sql)
-		;set st=##class(apptools.python.xlsx).sql2xlsx(sql,.format,filexlsx)
-		;w "s st=##class(apptools.python.xlsx).sql2xlsx("""_sql_""","""","""_filexlsx_""")"
-		
-		set gn="^||tmp",format=",s30,s50,s50,s15" 
-		set format("title")=title
-
- 		set st=##class(apptools.core.sys).sql2gn(sql,,gn)
-
- 		if 'st  write $$$appError($System.Status.GetErrorText(st)) quit st
-
- 		set IsVer=($SYSTEM.Version.Format(5,$zv)'>2021.2)
-
- 		set exec="##class(apptools.python.xlsx).MarkRed(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp)"
- 		set st=##class(apptools.python.xlsx).gn2xlsx(gn,.format,filexlsx,title,,,,$g(exec))
- 		if 'st  write $$$appError($System.Status.GetErrorText(st)) quit st
-
-		set st=##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(filexlsx,$$$slash,*), filexlsx, title,"apptools",.size)
-		write "<br>The report will be saved to a file <b>"_$p(filexlsx,$$$slash,*)_"</b> and will be available via "_urlfs quit $$$OK
-	}
-	w "<br>"_urlfs
+	do ..GetSensorProp(key, .pro,.sens) 
+	if '$d(pro) quit $$$OK
 	
+	set fromDate=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"fromDate")	
+	set toDate=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"toDate")	
+
+	set day=##class(apptools.core.type).GetHorYYYYMMDD(toDate)-##class(apptools.core.type).GetHorYYYYMMDD(fromDate)
+	
+	set st=##class(apptools.core.net).GetHttp(pro(0,"URL")_day,.out2,"","",pro(0,"username"),pro(0,"password"))
+	if 'st  write $$$appError($System.Status.GetErrorText(st)) quit st
+	;zw out2
+	set st=##class(apptools.core.files).Stream2String(out2("content"),.str)
+	;zw str
+	set json={}.$$$jsonFromJSON(str) ;.$$$jsonGet("array")
+	;set arr=[].$$$jsonFromJSON(json)
+	for i=0:1:json.array.$$$jsonSize()-1 {
+		set item = json.array.$$$jsonGet(i)
+		;w $e($p(item.text," ",2),1,16)_" ----------- "_$e($p(item.text," ",4),1,6)_"<br>"
+		w item.text_"<br>"
+				
+	}
+	;w [].$$$jsonFromJSON(json).cont
 	quit $$$OK
 }
 
-/// to download a form for editing
+/// ; PREFIX - Cam
+ClassMethod CamFirstHead(Par = "") As %Status
+{
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set %ui=1
+	set keyPref=$p(key,"Cam",2,*) ; PREFIX - Cam
+	set class="apptools.core.Parameter"
+	set sql="select top 1 * from "_##class(apptools.core.type).GetTableName(class)_" where Name ='key:"_keyPref_"'"
+	set gn="tmp"
+	do ##class(apptools.core.sys).sql2gn(sql,,gn)
+	if '$d(@gn@(1)) w $$$appError($namespace_" Item is empty "_NS_" "_sql) quit $$$OK
+		
+	set id=##class(apptools.core.sys).GetValue(gn,1,"ID")
+	set obj=$ClassMethod(class,"%OpenId",id)
+	if '$IsO(obj) w $$$appError("Item is empty id "_id) quit $$$OK
+	
+	set ns=$p(obj.Name,"key:",2)
+	set json=obj.JSON
+	do ..SetPropSideMenu(json,.pro,0,"URL","")
+	write $$$appError("No data")
+	;w json 
+	q $$$OK
+}
+
+/// to download a form for editing - SideMenu
 ClassMethod ParamFirstHead(Par = "") As %Status
 {
 	do ##class(apptools.core.Form).BlockUI(0)
 	set key=Par("key")
 	set divId=Par("divId")
 	set class="apptools.core.Parameter"
-	
-	set sql="select * from "_class_" where Name is not null order by id desc"
-	;The list of fields displayed in the Value attribute of the Option tag, 
-	;The first field of the query must be an identifier
-	set listFields="ID,ID,Name,Description"
-	write $$$aText("Select settings","")
-	s ONCHANGE=";$('#"_divId_"SelectId').attr('value',data.item.value);"
-	do ##class(apptools.core.Form).SelectObj(sql,ONCHANGE,listFields,.gn,divId_"Select")
-	
-	write "<br>"_$$$appInputHidden(divId_"SelectId","","")_"<br>"
-	
+
 	set onclick=$$$blockui("Wait...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","~key="_key_"~divId="_divId_"~class="_class_"~mode=*")
 
 	write $$$appTable1(class)
-	;set butt1=$$$appButton(divId_"appButtonResult1","onclick="""_$replace(onclick,"*",1)_"""",$$$aText("Preview mode in two columns",""))
 	set butt2=$$$appButton(divId_"appButtonResult2","onclick="""_$replace(onclick,"*",2)_"""",$$$aText("Create parameter",""))
 	set butt3=$$$appButton(divId_"appButtonResult3","onclick="""_$replace(onclick,"*",3)_"""",$$$aText("The view mode from table",""))
-	write $$$appTableTrTd1(butt2_butt3)
+	set butt1=$$$appButton(divId_"appButtonResult1","onclick="""_$replace(onclick,"*",1)_"""",$$$aText("Export Json",""))
+	set butt5=$$$appButton(divId_"appButtonResult1","onclick="""_$replace(onclick,"*",5)_"""",$$$aText("Export XML",""))
+	set butt4=$$$appButton(divId_"appButtonResult4","onclick="""_$replace(onclick,"*",4)_"""",$$$aText("Import",""))
+	write $$$appTableTrTd1(butt2_butt3_butt1_butt5_butt4)
 	write $$$appTableEnd1
 	quit $$$OK
 }
 
-// The result of selecting the edit mode settings
-
+/// The result of selecting the edit mode settings
 ClassMethod ParamResult(Par = "") As %Status
 {
 	do ##class(apptools.core.Form).BlockUI(0)
@@ -248,23 +345,62 @@ ClassMethod ParamResult(Par = "") As %Status
 	set class=Par("class")
 	set SelectId=$g(Par("%request.Data",divId_"SelectId"))
 	write ..ButtonAgain(divId,key)
-	if mode=1 {
-		;the order of the fields in two columns by the delimiter :
-		set order="Name,Description:Value,Types:DateStart,DateFinish:isEnabled,isEnabledCheck:File,OfficeFile:ImageFile,ImageGlobal::,"
-		do Show(0,order)
+	set ref=%request.CgiEnvs("HTTP_REFERER")
+	set url=$p(ref,"/a/",1)_"/a/info&namespace="_$namespace_"&autoload=FS"
+	set urlfs=" Fileserver in new window <a target=findinfo href='"_url_"'> Fileserver tab </a>"
+	set urlfs=" Fileserver in new window <a href='#' onclick=""$('#MenuFS').click()""> Fileserver tab </a>"
+	set NSpace=$namespace
+	if mode=5 {
+		set gn="%apptools.core.ParameterD.GBL"
+		do ##class(apptools.core.LogInfo).GetInputXLSTagsVal(.exportXLS, .exportXLSfile, .exportXLSfileEmail,.SDNum)
+		set exportfile=$replace(exportXLSfile,".xls","xml")
+		set arr(gn)=""
+		set st=$SYSTEM.OBJ.Export(.arr, exportfile)
+		if 'st  write $$$appError($System.Status.GetErrorText(st)) quit st
+		set st=##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(exportfile,$$$slash,*), exportfile, gn,"warmhome",.size)
+		write "<br>The report will be saved to a file <b>"_$p(exportfile,$$$slash,*)_"</b> and will be available via "_urlfs quit $$$OK
 		quit $$$OK
 	} 
+	if mode=1 {
+		set sql="select * from apptools_core.Parameter"
+		;set gn="^%apptools.core.ParameterD"		set sc=##class(apptools.util.json).Export(gn,.json) do json.%ToJSON()
+		do ##class(apptools.core.LogInfo).GetInputXLSTagsVal(.exportXLS, .exportXLSfile, .exportXLSfileEmail,.SDNum)
+		set exportfile=$replace(exportXLSfile,".xls","json")
+		set st=##class(apptools.core.json).ExportClassInstances("apptools.core.Parameter",sql,exportfile,.js) ;write ##class(apptools.core.json).Pretty(js)
+		if 'st  write $$$appError($System.Status.GetErrorText(st)) quit st
+		set st=##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(exportfile,$$$slash,*), exportfile, sql,"warmhome",.size)
+		write "<br>The report will be saved to a file <b>"_$p(exportfile,$$$slash,*)_"</b> and will be available via "_urlfs quit $$$OK
+		quit $$$OK
+	} 
+	if mode=4 {
+		set msg="WebTerminal"
+		&html<<center><b>#(msg)#</b></center>>
+		write $$$appMsg("set st=##class(apptools.core.json).ImportClassInstances(""/tmp/gateways.json"",.js,.change)")
+		if ##class(apptools.core.sys).ClassExist("WebTerminal.Engine") {
+			;set change("Name")="read" 
+			write $$$appMsg("set st=##class(apptools.core.json).ImportClassInstances(""/tmp/gateways.json"",.js,.change)")
+			write !,"<iframe style='width:95%; height:70%' id='terminal"_NSpace_"' src='/terminal/?ns="_NSpace_"&clean=1' ></iframe>"
+		}
+		else { write $$$appError(msg_" not installed")
+		}
+		
+		;set change("Name")="read" 
+		;set st=##class(apptools.core.json).ImportClassInstances("/tmp/gateways.json",.js,.change)
+		;if 'st  write $$$appError($System.Status.GetErrorText(st)) quit st
+		quit $$$OK
+	} 
+
 	elseif mode=2 {
 		;the order of fields by default
 		set order=""
-		do Show("1,ShowFieldName",order)
+		do Show("1,ShowFieldName,WithCreate",order) ;add copy button
 		quit $$$OK
 	} 
 	elseif mode=3 {
 		set sql="select * from apptools_core.Parameter"
 		set exec="##class(apptools.Form.Explorer).WinEditObj(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp,"""_$zu(5)_""")"
 		set st=##class(apptools.Form.Explorer).SelectObjects(class,sql,exec)
-		write 'st w $$$appError($System.Status.GetErrorText(st)) 
+		if $$$ISERR(st) w $$$appError($System.Status.GetErrorText(st)) 
 	}
 	q $$$OK
 Show(modeShow,order)
