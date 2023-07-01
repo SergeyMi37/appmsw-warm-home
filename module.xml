@@ -22,7 +22,8 @@
 	<Invokes>
         <Invoke Class="apptools.lte.warmhome" Method="Init"></Invoke>
     </Invokes>
-	<Resource Name="apptools.lte.warmhome.CLS"/>
+    <Resource Name="apptools.lte.warmhome.CLS"/>
+    <Resource Name="%apptools.core.ParameterD.GBL" />
     </Module>
   </Document>
 </Export>
