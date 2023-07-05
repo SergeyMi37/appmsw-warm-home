@@ -18,6 +18,7 @@ ClassMethod Init() As %Status
 	set ServerPort=##class(apptools.core.net).GetURI(.prop)
 	write !,"Open in browser "
     do ##class(apptools.core.Installer).AddAndWriteFavorite(##class(apptools.core.Installer).#AppName_" SampleAdminPanel","/"_##class(apptools.core.Installer).#AppCSP_"rest/a/smarthome",ServerPort)
+    quit $$$OK
 }
 
 /// Replace parameters
@@ -261,7 +262,7 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	do ##class(apptools.core.Form).BlockUI(0)
 	set key=Par("key")
 	set divId=Par("divId")
-	set mode=Par("mode")
+	;set mode=Par("mode")
 	
 	do ..GetSensorProp(key, .pro,.sens) 
 	if '$d(pro) quit $$$OK
@@ -297,7 +298,7 @@ ClassMethod CamFirstHead(Par = "") As %Status
 {
 	do ##class(apptools.core.Form).BlockUI(0)
 	set key=Par("key")
-	set divId=Par("divId")
+	;set divId=Par("divId")
 	set %ui=1
 	set keyPref=$p(key,"Cam",2,*) ; PREFIX - Cam
 	set class="apptools.core.Parameter"
@@ -310,7 +311,7 @@ ClassMethod CamFirstHead(Par = "") As %Status
 	set obj=$ClassMethod(class,"%OpenId",id)
 	if '$IsO(obj) w $$$appError("Item is empty id "_id) quit $$$OK
 	
-	set ns=$p(obj.Name,"key:",2)
+	;set ns=$p(obj.Name,"key:",2)
 	set json=obj.JSON
 	do ..SetPropSideMenu(json,.pro,0,"URL","")
 	write $$$appError("No data")
